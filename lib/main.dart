@@ -14,18 +14,15 @@ class MyApp extends StatelessWidget {
         // app bar //
         appBar: AppBar(
           backgroundColor: const Color.fromARGB(255, 83, 120, 255),
-
-        title: const Text('To do list',
-           style: TextStyle(
+          title: const Text(
+            'September 13',
+            style: TextStyle(
               color: Colors.white, // Set the text color here
               fontSize: 20, // Optionally, adjust the font size
             ),
-          ), 
+          ),
         ),
-
-
       ),
     );
   }
 }
-  
