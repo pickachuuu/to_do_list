@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:to_do_list/util/entry_tile.dart';
 
 void main() {
   runApp(const MyApp());
@@ -22,6 +23,12 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
+
+      body: ListView(
+        children: [
+          EntryTile(title: 'Finish Introduction to Cybersecurity', isCompleted: false,),
+        ]
+      ),
       ),
     );
   }
