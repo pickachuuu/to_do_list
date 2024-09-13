@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:google_fonts/google_fonts.dart'; // Import Google Fonts package
+import 'package:google_fonts/google_fonts.dart';
+import 'package:to_do_list/util/list_tile.dart';
 
 void main() {
   runApp(const MyApp());
@@ -45,7 +46,17 @@ class MyApp extends StatelessWidget {
             ],
           ),
         ),
+
+      body: ListView(
+        children: const [
+          TaskList(),
+          TaskList(),
+          TaskList()
+        ],
+      )
+
       ),
     );
   }
 }
+
