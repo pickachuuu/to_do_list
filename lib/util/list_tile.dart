@@ -28,14 +28,15 @@ class _TaskListState extends State<TaskList> {
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
         color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.2),
-                  offset: Offset(0, 4),
-                  blurRadius: 2,
-                  spreadRadius: 1,
-            )
-          ]
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.2),
+                offset: Offset(0, 4),
+                blurRadius: 2,
+                spreadRadius: 1,
+          )
+        ]
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
