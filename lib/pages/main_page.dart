@@ -11,9 +11,12 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-
-
 class _HomePageState extends State<HomePage> {
+
+  List tileVal = [
+    ["Start checklist logic", false, ["Subtask 1", "Subtask 2", "Subtask 4"]],
+    ["Finish check logic", false, ["Subtask 3", "Subtask 5"]],
+  ];
 
   void createTask(){
     showDialog(
@@ -24,6 +27,13 @@ class _HomePageState extends State<HomePage> {
     );
   }
   
+
+  void boxSelected(bool? value, int index) {
+    setState(() {
+      tileVal[index][1] = !tileVal[index][1];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // Get the current date
@@ -65,12 +75,18 @@ class _HomePageState extends State<HomePage> {
         child: const Icon(Icons.add),
       ),
 
-      body: ListView(
-        children: [
-          TaskTile(taskName: "Finish Tile Feat", isSelected: true, onChanged:(p0) {
-            
-          },),
-        ], 
+      body: ListView.builder(
+        itemCount: tileVal.length,
+        itemBuilder: (context, index) {
+          print(tileVal[1][2]);
+
+          return TaskTile(
+            taskName: tileVal[index][0],
+            isSelected: tileVal[index][1],
+            taskList: tileVal[index][2],
+            onChanged: (value) => boxSelected(value, index),
+          );
+        },
       )
       );
   }
