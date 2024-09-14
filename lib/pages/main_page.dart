@@ -11,6 +11,8 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+
+
 class _HomePageState extends State<HomePage> {
 
   void createTask(){
@@ -64,12 +66,12 @@ class _HomePageState extends State<HomePage> {
       ),
 
       body: ListView(
-        children: const [
-          TaskList(),
-          TaskList()
-        ],
+        children: [
+          TaskTile(taskName: "Finish Tile Feat", isSelected: true, onChanged:(p0) {
+            
+          },),
+        ], 
       )
-
       );
   }
 }
