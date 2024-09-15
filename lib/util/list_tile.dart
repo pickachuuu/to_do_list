@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:to_do_list/data/database.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class TaskTile extends StatefulWidget {
   final String taskName;
@@ -20,14 +22,15 @@ class TaskTile extends StatefulWidget {
 }
 
 class _TaskTileState extends State<TaskTile> {
-  List<String> _subtasks = [];
+  final _myBox = Hive.box('mybox');
+  ToDoDatabase db = ToDoDatabase();
   final TextEditingController _editController = TextEditingController();
   final TextEditingController _newTaskController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _subtasks = widget.taskList;
+    
   }
 
 void _addSubtask() {
@@ -48,8 +51,10 @@ void _addSubtask() {
           onPressed: () {
             if (_newTaskController.text.isNotEmpty) {
               setState(() {
-                _subtasks.add(_newTaskController.text);
+                widget.taskList.add(_newTaskController.text);
+                db.updateSubtask(widget.taskName, _newTaskController.text);
                 _newTaskController.clear();
+
               });
             }
             Navigator.pop(context);
@@ -62,7 +67,7 @@ void _addSubtask() {
 }
 
   void _editSubtask(int index) {
-    _editController.text = _subtasks[index];
+    _editController.text = widget.taskList[index];
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -79,7 +84,7 @@ void _addSubtask() {
           TextButton(
             onPressed: () {
               setState(() {
-                _subtasks[index] = _editController.text;
+                widget.taskList[index] = _editController.text;
               });
               Navigator.pop(context);
             },
@@ -127,10 +132,10 @@ void _addSubtask() {
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: _subtasks.length,
+              itemCount: widget.taskList.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text(_subtasks[index]),
+                  title: Text(widget.taskList[index]),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -140,7 +145,7 @@ void _addSubtask() {
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete, size: 18),
-                        onPressed: () => setState(() => _subtasks.removeAt(index)),
+                        onPressed: () => setState(() => widget.taskList.removeAt(index)),
                       ),
                     ],
                   ),
