@@ -21,8 +21,8 @@ class TaskTile extends StatefulWidget {
 
 class _TaskTileState extends State<TaskTile> {
   List<String> _subtasks = [];
-  TextEditingController _editController = TextEditingController();
-  TextEditingController _newTaskController = TextEditingController();
+  final TextEditingController _editController = TextEditingController();
+  final TextEditingController _newTaskController = TextEditingController();
 
   @override
   void initState() {
@@ -30,44 +30,46 @@ class _TaskTileState extends State<TaskTile> {
     _subtasks = widget.taskList;
   }
 
-  void _addSubtask() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add New Task'),
-        content: TextField(
-          controller: _newTaskController,
-          decoration: const InputDecoration(hintText: 'Enter new task'),
+void _addSubtask() {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Add New Task'),
+      content: TextField(
+        controller: _newTaskController,
+        decoration: const InputDecoration(hintText: 'Enter new task'),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
+        TextButton(
+          onPressed: () {
+            if (_newTaskController.text.isNotEmpty) {
               setState(() {
                 _subtasks.add(_newTaskController.text);
                 _newTaskController.clear();
               });
-              Navigator.pop(context);
-            },
-            child: const Text('Add'),
-          ),
-        ],
-      ),
-    );
-  }
+            }
+            Navigator.pop(context);
+          },
+          child: const Text('Add'),
+        ),
+      ],
+    ),
+  );
+}
 
   void _editSubtask(int index) {
     _editController.text = _subtasks[index];
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Edit Subtask'),
+        title: const Text('Edit item'),
         content: TextField(
           controller: _editController,
-          decoration: const InputDecoration(hintText: 'Enter new subtask'),
+          decoration: const InputDecoration(hintText: 'Add item'),
         ),
         actions: [
           TextButton(
@@ -99,7 +101,7 @@ class _TaskTileState extends State<TaskTile> {
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.5),
-              offset: Offset(0, 2),
+              offset: const Offset(0, 2),
               blurRadius: 4,
             ),
           ],
@@ -151,7 +153,7 @@ class _TaskTileState extends State<TaskTile> {
                     icon: const Icon(Icons.add, size: 18),
                     onPressed: _addSubtask,
                   ),
-                  Text("List item"),
+                  const Text("List item"),
                 ],
               ),
           ],
