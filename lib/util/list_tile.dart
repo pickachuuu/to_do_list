@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:to_do_list/data/database.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class TaskTile extends StatefulWidget {
   final String taskName;
@@ -20,54 +22,59 @@ class TaskTile extends StatefulWidget {
 }
 
 class _TaskTileState extends State<TaskTile> {
-  List<String> _subtasks = [];
-  TextEditingController _editController = TextEditingController();
-  TextEditingController _newTaskController = TextEditingController();
+  final _myBox = Hive.box('mybox');
+  ToDoDatabase db = ToDoDatabase();
+  final TextEditingController _editController = TextEditingController();
+  final TextEditingController _newTaskController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _subtasks = widget.taskList;
+    
   }
 
-  void _addSubtask() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add New Task'),
-        content: TextField(
-          controller: _newTaskController,
-          decoration: const InputDecoration(hintText: 'Enter new task'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _subtasks.add(_newTaskController.text);
-                _newTaskController.clear();
-              });
-              Navigator.pop(context);
-            },
-            child: const Text('Add'),
-          ),
-        ],
+void _addSubtask() {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Add New Task'),
+      content: TextField(
+        controller: _newTaskController,
+        decoration: const InputDecoration(hintText: 'Enter new task'),
       ),
-    );
-  }
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () {
+            if (_newTaskController.text.isNotEmpty) {
+              setState(() {
+                widget.taskList.add(_newTaskController.text);
+                db.updateSubtask(widget.taskName, _newTaskController.text);
+                _newTaskController.clear();
+
+              });
+            }
+            Navigator.pop(context);
+          },
+          child: const Text('Add'),
+        ),
+      ],
+    ),
+  );
+}
 
   void _editSubtask(int index) {
-    _editController.text = _subtasks[index];
+    _editController.text = widget.taskList[index];
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Edit Subtask'),
+        title: const Text('Edit item'),
         content: TextField(
           controller: _editController,
-          decoration: const InputDecoration(hintText: 'Enter new subtask'),
+          decoration: const InputDecoration(hintText: 'Add item'),
         ),
         actions: [
           TextButton(
@@ -77,7 +84,7 @@ class _TaskTileState extends State<TaskTile> {
           TextButton(
             onPressed: () {
               setState(() {
-                _subtasks[index] = _editController.text;
+                widget.taskList[index] = _editController.text;
               });
               Navigator.pop(context);
             },
@@ -99,7 +106,7 @@ class _TaskTileState extends State<TaskTile> {
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.5),
-              offset: Offset(0, 2),
+              offset: const Offset(0, 2),
               blurRadius: 4,
             ),
           ],
@@ -125,10 +132,10 @@ class _TaskTileState extends State<TaskTile> {
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: _subtasks.length,
+              itemCount: widget.taskList.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text(_subtasks[index]),
+                  title: Text(widget.taskList[index]),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -138,7 +145,7 @@ class _TaskTileState extends State<TaskTile> {
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete, size: 18),
-                        onPressed: () => setState(() => _subtasks.removeAt(index)),
+                        onPressed: () => setState(() => widget.taskList.removeAt(index)),
                       ),
                     ],
                   ),
@@ -151,7 +158,7 @@ class _TaskTileState extends State<TaskTile> {
                     icon: const Icon(Icons.add, size: 18),
                     onPressed: _addSubtask,
                   ),
-                  Text("List item"),
+                  const Text("List item"),
                 ],
               ),
           ],

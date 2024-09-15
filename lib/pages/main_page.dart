@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:to_do_list/data/database.dart';
 import 'package:to_do_list/util/dialog_box.dart';
 import 'package:to_do_list/util/list_tile.dart';
 
@@ -12,29 +14,48 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final _myBox = Hive.box('mybox');
+  ToDoDatabase db = ToDoDatabase();
 
-  List tileVal = [
-    ["Start checklist logic", false, ["Subtask 1", "Subtask 2", "Subtask 4"]],
-    ["Finish check logic", false, ["Subtask 3", "Subtask 5"]],
-  ];
+  final _controller = TextEditingController();
+    @override
+  void initState(){
+    if(_myBox.get("TODOLIST") == null){
+      db.createInitialData();
+    }else{
+      db.loadData();
+    }
+    super.initState();
+  }
+
+  void saveNewTask(){
+    setState(() {
+      db.tileVal.add([ _controller.text, false, <String>[]]);
+    });
+    Navigator.of(context).pop();
+    db.updateData();
+  }
 
   void createTask(){
     showDialog(
       context: context,
       builder: (context) {
-        return DialogBox();
+        return DialogBox(
+          controller: _controller,
+          onSave: saveNewTask,
+          onCancel: () => {Navigator.of(context).pop()},
+        );
       },
     );
   }
   
-
   void boxSelected(bool? value, int index) {
     setState(() {
-      tileVal[index][1] = !tileVal[index][1];
+      db.tileVal[index][1] = !db.tileVal[index][1];
     });
+    db.updateData();
   }
 
-  @override
   Widget build(BuildContext context) {
     // Get the current date
     final DateTime now = DateTime.now();
@@ -57,7 +78,6 @@ class _HomePageState extends State<HomePage> {
                   fontStyle: FontStyle.italic, // Add some design to the font
                 ),
               ),
-
               Text(
                 'To Do List',
                 style: GoogleFonts.robotoCondensed(
@@ -76,19 +96,17 @@ class _HomePageState extends State<HomePage> {
       ),
 
       body: ListView.builder(
-        itemCount: tileVal.length,
+        itemCount: db.tileVal.length,
         itemBuilder: (context, index) {
-          print(tileVal[1][2]);
-
           return TaskTile(
-            taskName: tileVal[index][0],
-            isSelected: tileVal[index][1],
-            taskList: tileVal[index][2],
+            taskName: db.tileVal[index][0],
+            isSelected: db.tileVal[index][1],
+            taskList: db.tileVal[index][2],
             onChanged: (value) => boxSelected(value, index),
           );
         },
       )
-      );
+    );
   }
 }
 
