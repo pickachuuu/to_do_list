@@ -28,6 +28,8 @@ class _HomePageState extends State<HomePage> {
     } else {
       db.loadData();
     }
+
+    
     super.initState();
   }
 
@@ -50,7 +52,7 @@ class _HomePageState extends State<HomePage> {
   // Save new task
   void saveNewTask() {
     setState(() {
-      db.tileVal.add([_controller.text, false, <String>[]]);
+      db.tileVal.add([_controller.text, false, []]);
     });
     Navigator.of(context).pop();
     db.updateData();

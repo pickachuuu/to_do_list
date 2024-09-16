@@ -1,37 +1,24 @@
 import 'package:hive_flutter/hive_flutter.dart';
 class ToDoDatabase{
-    List tileVal = [];
+    List<dynamic> tileVal = [];
     final _myBox = Hive.box('mybox');
 
     void createInitialData() {
       tileVal = [
-        ["Welcome to your list", false, <String>[]],
-        ["List your items", false, <String>["Your task"]]
+        ["Welcome to your list", false, [["Incomplete task", false]]],
+         ["second list", false, [["Complete task", false]]]
       ];
     }
 
-    void loadData(){
-      tileVal = _myBox.get("TODOLIST");
-    }
+    void loadData() {
+      final retrievedData = _myBox.get("TODOLIST");
+      print("Retrieved data: $retrievedData"); // Add this line
+       tileVal = retrievedData is List<dynamic> ? retrievedData : [];
+       print("Retrieved tile: $tileVal");
+    } 
 
     void updateData(){
       _myBox.put("TODOLIST", tileVal);
     }
 
-
-    void updateSubtask(String taskName, String newSubtask, {int index = -1}) {
-    int taskIndex = tileVal.indexWhere((element) => element[0] == taskName);
-
-    if (taskIndex != -1) {
-      if (index != null) {
-        tileVal[taskIndex][2][index] = newSubtask;
-      } else {
-        tileVal[taskIndex][2].add(newSubtask);
-      }
-
-      updateData();
-    } else {
-      print('Task not found: $taskName'); // Handle the case where the task doesn't exist
-    }
-  }
 }
