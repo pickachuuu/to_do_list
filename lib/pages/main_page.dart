@@ -27,6 +27,7 @@ class _HomePageState extends State<HomePage> {
       db.createInitialData();
     } else {
       db.loadData();
+      print("tile values = ${db.tileVal}");
     }
 
     
@@ -144,9 +145,10 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: const Color(0xff2575fc),
         child: const Icon(Icons.add, color: Colors.white),
       ),
-
+      
       // Body containing the list of tasks
       body: ListView.builder(
+        
         itemCount: db.tileVal.length,
         itemBuilder: (context, index) {
           return TaskTile(
@@ -154,6 +156,8 @@ class _HomePageState extends State<HomePage> {
             isSelected: db.tileVal[index][1],
             taskList: db.tileVal[index][2],
             onChanged: (value) => boxSelected(value, index),
+            index: index,
+            onUpdate: (index, newSubtask) => db.updateInnerList(index, newSubtask),
           );
         },
       ),
