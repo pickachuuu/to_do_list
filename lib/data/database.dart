@@ -13,12 +13,23 @@ class ToDoDatabase{
     void loadData() {
       final retrievedData = _myBox.get("TODOLIST");
       print("Retrieved data: $retrievedData"); // Add this line
-       tileVal = retrievedData is List<dynamic> ? retrievedData : [];
-       print("Retrieved tile: $tileVal");
+      tileVal = retrievedData is List<dynamic> ? retrievedData : [];
+      print("Retrieved tile: $tileVal");
     } 
 
     void updateData(){
       _myBox.put("TODOLIST", tileVal);
     }
+
+  void updateInnerList(int index, List<dynamic> newSubtask) {
+    // Access the inner list
+    // print("Runtime type of inner list: ${.runtimeType}");
+    // print("Runtime type of test list: ${newSubtask.runtimeType}");
+
+    print("${tileVal[index][2]} and ${newSubtask}");
+
+    // tileVal[index][2].add(newSubtask);
+    _myBox.put("TODOLIST", tileVal);
+  }
 
 }

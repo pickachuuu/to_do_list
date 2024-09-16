@@ -8,6 +8,8 @@ class TaskTile extends StatefulWidget {
   final bool isSelected;
   final List<dynamic> taskList;
   final Function(bool?)? onChanged;
+  final int index;
+  final Function(int, List<dynamic>) onUpdate;
 
   TaskTile({
     super.key,
@@ -15,6 +17,8 @@ class TaskTile extends StatefulWidget {
     required this.isSelected,
     required this.taskList,
     required this.onChanged,
+    required this.index,
+    required this.onUpdate
   });
 
   @override
@@ -51,8 +55,9 @@ class _TaskTileState extends State<TaskTile> {
               if (_newTaskController.text.isNotEmpty) {
                 setState(() {
                   widget.taskList.add([_newTaskController.text, false]);
-                  _newTaskController.clear();
                 });
+                widget.onUpdate(widget.index, [_newTaskController.text, false]);
+                _newTaskController.clear();
               }
               Navigator.pop(context);
             },
@@ -194,7 +199,7 @@ class _TaskTileState extends State<TaskTile> {
                 ),
                 title: Text(
                   subtask[0],
-                  style: TextStyle( decoration: TextDecoration.lineThrough,
+                  style: const TextStyle( decoration: TextDecoration.lineThrough,
                 )
                 ),
                 trailing: Row(
