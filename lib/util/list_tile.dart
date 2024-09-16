@@ -10,7 +10,9 @@ class TaskTile extends StatefulWidget {
   final Function(bool?)? onChanged;
   final int index;
   final Function(int, List<dynamic>) onInsert;
-  VoidCallback updateData;
+  final VoidCallback updateData;
+  final VoidCallback editTask; // Callback for editing the main task
+  final VoidCallback deleteTask; // Callback for deleting the main task
 
   TaskTile({
     super.key,
@@ -21,6 +23,8 @@ class TaskTile extends StatefulWidget {
     required this.index,
     required this.onInsert,
     required this.updateData,
+    required this.editTask,
+    required this.deleteTask,
   });
 
   @override
@@ -71,7 +75,8 @@ class _TaskTileState extends State<TaskTile> {
   }
 
   void _editSubtask(int index) {
-    _editController.text = widget.taskList[index][0]; // Pre-fill with subtask name
+    _editController.text =
+        widget.taskList[index][0]; // Pre-fill with subtask name
 
     showDialog(
       context: context,
@@ -90,7 +95,8 @@ class _TaskTileState extends State<TaskTile> {
             onPressed: () {
               if (_editController.text.isNotEmpty) {
                 setState(() {
-                  widget.taskList[index][0] = _editController.text; // Update subtask name
+                  widget.taskList[index][0] =
+                      _editController.text; // Update subtask name
                 });
                 widget.updateData();
               }
@@ -134,6 +140,17 @@ class _TaskTileState extends State<TaskTile> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  color: Colors.grey, // Gray color for edit button
+                  onPressed: widget.editTask,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  color: Colors.grey, // Gray color for delete button
+                  onPressed: widget.deleteTask,
+                ),
               ],
             ),
             const Divider(thickness: 2),
@@ -144,13 +161,15 @@ class _TaskTileState extends State<TaskTile> {
               itemBuilder: (context, index) {
                 final subtask = widget.taskList[index];
                 return Visibility(
-                  visible: !(subtask[1] as bool), // Invert the visibility based on the boolean value
+                  visible: !(subtask[1]
+                      as bool), // Invert the visibility based on the boolean value
                   child: ListTile(
                     leading: Checkbox(
                       value: subtask[1], // Invert the subtask completion status
                       onChanged: (value) {
                         setState(() {
-                          subtask[1] = value!; // Update subtask's completion status with inverted value
+                          subtask[1] =
+                              value!; // Update subtask's completion status with inverted value
                         });
                         widget.updateData();
                       },
@@ -165,7 +184,8 @@ class _TaskTileState extends State<TaskTile> {
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete, size: 18),
-                          onPressed: () => setState(() => widget.taskList.removeAt(index)),
+                          onPressed: () =>
+                              setState(() => widget.taskList.removeAt(index)),
                         ),
                       ],
                     ),
@@ -187,49 +207,51 @@ class _TaskTileState extends State<TaskTile> {
             ),
             const Divider(),
 
-            // display all the subtask that has true for its boolean value //
-
+            // Display all the subtasks that have true for their boolean value
             ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: widget.taskList.where((subtask) => subtask[1] as bool).length,
-            itemBuilder: (context, index) {
-              final subtask = widget.taskList.where((subtask) => subtask[1] as bool).toList()[index];
-              return ListTile(
-                leading: Checkbox(
-                  value: subtask[1],
-                  onChanged: (value) {
-                    setState(() {
-                      subtask[1] = value!;
-                    });
-                    widget.updateData();
-                  },
-                ),
-                title: Text(
-                  subtask[0],
-                  style: const TextStyle( decoration: TextDecoration.lineThrough,
-                )
-                ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit, size: 18),
-                      onPressed: () => _editSubtask(index),
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount:
+                  widget.taskList.where((subtask) => subtask[1] as bool).length,
+              itemBuilder: (context, index) {
+                final subtask = widget.taskList
+                    .where((subtask) => subtask[1] as bool)
+                    .toList()[index];
+                return ListTile(
+                  leading: Checkbox(
+                    value: subtask[1],
+                    onChanged: (value) {
+                      setState(() {
+                        subtask[1] = value!;
+                      });
+                      widget.updateData();
+                    },
+                  ),
+                  title: Text(
+                    subtask[0],
+                    style: const TextStyle(
+                      decoration: TextDecoration.lineThrough,
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.delete, size: 18),
-                      onPressed: () {
-                        setState(() => widget.taskList.removeAt(index));
-                        widget.updateData();
-                      },
-                    ),
-                  ],
-                ),
-              );
-            },
-          )
-
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit, size: 18),
+                        onPressed: () => _editSubtask(index),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, size: 18),
+                        onPressed: () {
+                          setState(() => widget.taskList.removeAt(index));
+                          widget.updateData();
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ],
         ),
       ),

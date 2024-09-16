@@ -111,8 +111,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       );
-    }
-else {
+    } else {
       // Select all tasks
       setState(() {
         for (var task in db.tileVal) {
@@ -165,12 +164,38 @@ else {
     );
   }
 
+  void _deleteTask(int index) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Task'),
+        content: const Text('Are you sure you want to delete this task?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                db.tileVal.removeAt(index); // Remove the task
+              });
+              db.updateData();
+              Navigator.pop(context);
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Format the selected date
     final String formattedDate =
         DateFormat('EEEE, MMMM d').format(selectedDate);
-return Scaffold(
+    return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -258,8 +283,11 @@ return Scaffold(
               taskList: db.tileVal[index][2],
               onChanged: (value) => boxSelected(value, index),
               index: index, // Ensure index is passed
-              onInsert: (index, newSubtask) => db.insertInnerList(index, newSubtask),
+              onInsert: (index, newSubtask) =>
+                  db.insertInnerList(index, newSubtask),
               updateData: () => db.updateData(),
+              editTask: () => _editTask(index), // Pass the edit callback
+              deleteTask: () => _deleteTask(index), // Pass the delete callback
             );
           },
         ),
