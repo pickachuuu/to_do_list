@@ -36,10 +36,10 @@ class _TaskTileState extends State<TaskTile> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Add New Subtask'),
+        title: const Text('Add item'),
         content: TextField(
           controller: _newTaskController,
-          decoration: const InputDecoration(hintText: 'Enter new subtask'),
+          decoration: const InputDecoration(hintText: 'Enter item'),
         ),
         actions: [
           TextButton(
@@ -69,10 +69,10 @@ class _TaskTileState extends State<TaskTile> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Edit Subtask'),
+        title: const Text('Edit item'),
         content: TextField(
           controller: _editController,
-          decoration: const InputDecoration(hintText: 'Enter new subtask'),
+          decoration: const InputDecoration(hintText: 'Edit item'),
         ),
         actions: [
           TextButton(

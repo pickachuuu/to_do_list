@@ -72,7 +72,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Mark a task as selected
   void boxSelected(bool? value, int index) {
     setState(() {
       db.tileVal[index][1] = !db.tileVal[index][1];
@@ -105,7 +104,6 @@ class _HomePageState extends State<HomePage> {
         ),
         title: Stack(
           children: [
-            // Align 'To Do\'s' to the left
             Align(
               alignment: Alignment.centerLeft,
               child: Padding(
@@ -143,7 +141,7 @@ class _HomePageState extends State<HomePage> {
       // Floating action button to add new tasks
       floatingActionButton: FloatingActionButton(
         onPressed: createTask,
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: const Color(0xff2575fc),
         child: const Icon(Icons.add, color: Colors.white),
       ),
 
