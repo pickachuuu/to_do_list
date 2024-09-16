@@ -157,7 +157,8 @@ class _HomePageState extends State<HomePage> {
             taskList: db.tileVal[index][2],
             onChanged: (value) => boxSelected(value, index),
             index: index,
-            onUpdate: (index, newSubtask) => db.updateInnerList(index, newSubtask),
+            onInsert: (index, newSubtask) => db.insertInnerList(index, newSubtask),
+            updateData: () => db.updateData(),
           );
         },
       ),

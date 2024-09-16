@@ -21,15 +21,14 @@ class ToDoDatabase{
       _myBox.put("TODOLIST", tileVal);
     }
 
-  void updateInnerList(int index, List<dynamic> newSubtask) {
-    // Access the inner list
-    // print("Runtime type of inner list: ${.runtimeType}");
-    // print("Runtime type of test list: ${newSubtask.runtimeType}");
+    void insertInnerList(int index, List<dynamic> newSubtask) {
+      // Access the inner list
+      // print("Runtime type of inner list: ${.runtimeType}");
+      // print("Runtime type of test list: ${newSubtask.runtimeType}");
 
-    print("${tileVal[index][2]} and ${newSubtask}");
+      print("${tileVal[index][2]} and ${newSubtask}");
 
-    // tileVal[index][2].add(newSubtask);
-    _myBox.put("TODOLIST", tileVal);
-  }
-
+      // tileVal[index][2].add(newSubtask);
+      _myBox.put("TODOLIST", tileVal);
+    }
 }

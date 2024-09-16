@@ -9,7 +9,8 @@ class TaskTile extends StatefulWidget {
   final List<dynamic> taskList;
   final Function(bool?)? onChanged;
   final int index;
-  final Function(int, List<dynamic>) onUpdate;
+  final Function(int, List<dynamic>) onInsert;
+  VoidCallback updateData;
 
   TaskTile({
     super.key,
@@ -18,7 +19,8 @@ class TaskTile extends StatefulWidget {
     required this.taskList,
     required this.onChanged,
     required this.index,
-    required this.onUpdate
+    required this.onInsert,
+    required this.updateData,
   });
 
   @override
@@ -40,10 +42,10 @@ class _TaskTileState extends State<TaskTile> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Add New Subtask'),
+        title: const Text('Add item'),
         content: TextField(
           controller: _newTaskController,
-          decoration: const InputDecoration(hintText: 'Enter new subtask'),
+          decoration: const InputDecoration(hintText: 'Enter item'),
         ),
         actions: [
           TextButton(
@@ -56,7 +58,7 @@ class _TaskTileState extends State<TaskTile> {
                 setState(() {
                   widget.taskList.add([_newTaskController.text, false]);
                 });
-                widget.onUpdate(widget.index, [_newTaskController.text, false]);
+                widget.onInsert(widget.index, [_newTaskController.text, false]);
                 _newTaskController.clear();
               }
               Navigator.pop(context);
@@ -69,15 +71,15 @@ class _TaskTileState extends State<TaskTile> {
   }
 
   void _editSubtask(int index) {
-    _editController.text = widget.taskList[index][1]; // Pre-fill with subtask name
+    _editController.text = widget.taskList[index][0]; // Pre-fill with subtask name
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Edit Subtask'),
+        title: const Text('Edit item'),
         content: TextField(
           controller: _editController,
-          decoration: const InputDecoration(hintText: 'Enter new subtask'),
+          decoration: const InputDecoration(hintText: 'Edit item'),
         ),
         actions: [
           TextButton(
@@ -88,8 +90,9 @@ class _TaskTileState extends State<TaskTile> {
             onPressed: () {
               if (_editController.text.isNotEmpty) {
                 setState(() {
-                  widget.taskList[index][1] = _editController.text; // Update subtask name
+                  widget.taskList[index][0] = _editController.text; // Update subtask name
                 });
+                widget.updateData();
               }
               Navigator.pop(context);
             },
@@ -149,6 +152,7 @@ class _TaskTileState extends State<TaskTile> {
                         setState(() {
                           subtask[1] = value!; // Update subtask's completion status with inverted value
                         });
+                        widget.updateData();
                       },
                     ),
                     title: Text(subtask[0]),
@@ -175,7 +179,7 @@ class _TaskTileState extends State<TaskTile> {
                   icon: const Icon(Icons.add, size: 18),
                   onPressed: _addSubtask,
                 ),
-                const Text("List item"),
+                const Text("Add item"),
               ],
             ),
             const Divider(),
@@ -195,6 +199,7 @@ class _TaskTileState extends State<TaskTile> {
                     setState(() {
                       subtask[1] = value!;
                     });
+                    widget.updateData();
                   },
                 ),
                 title: Text(
