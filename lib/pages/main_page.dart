@@ -17,6 +17,7 @@ class _HomePageState extends State<HomePage> {
   final _myBox = Hive.box('mybox');
   ToDoDatabase db = ToDoDatabase();
   final _controller = TextEditingController();
+  bool _isSelectingAll = false;
 
   // Selected date for date picker
   DateTime selectedDate = DateTime.now();
@@ -27,10 +28,7 @@ class _HomePageState extends State<HomePage> {
       db.createInitialData();
     } else {
       db.loadData();
-      print("tile values = ${db.tileVal}");
     }
-
-    
     super.initState();
   }
 
@@ -67,27 +65,112 @@ class _HomePageState extends State<HomePage> {
         return DialogBox(
           controller: _controller,
           onSave: saveNewTask,
-          onCancel: () => {Navigator.of(context).pop()},
+          onCancel: () => Navigator.of(context).pop(),
         );
       },
     );
   }
 
+  // Handle checkbox selection
   void boxSelected(bool? value, int index) {
     setState(() {
-      db.tileVal[index][1] = !db.tileVal[index][1];
+      db.tileVal[index][1] = value!; // Update the task's selected state
     });
     db.updateData();
   }
 
+  // Select or delete all tasks
+  void _selectOrDeleteAll() {
+    if (_isSelectingAll) {
+      // If delete mode, confirm before deleting
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Delete All'),
+          content:
+              const Text('Are you sure you want to delete all selected tasks?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                // Restore state if user cancels
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  db.tileVal.removeWhere(
+                      (task) => task[1] == true); // Delete only selected tasks
+                });
+                db.updateData();
+                Navigator.pop(context);
+              },
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        ),
+      );
+    }
+else {
+      // Select all tasks
+      setState(() {
+        for (var task in db.tileVal) {
+          task[1] = true; // Mark all tasks as selected
+        }
+      });
+      db.updateData();
+    }
+
+    // Toggle the button state
+    setState(() {
+      _isSelectingAll = !_isSelectingAll;
+    });
+  }
+
+  // Edit a task
+  void _editTask(int index) {
+    final TextEditingController _editController = TextEditingController();
+    _editController.text =
+        db.tileVal[index][0]; // Pre-fill with current task name
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Task'),
+        content: TextField(
+          controller: _editController,
+          decoration: const InputDecoration(hintText: 'Enter new task name'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (_editController.text.isNotEmpty) {
+                setState(() {
+                  db.tileVal[index][0] =
+                      _editController.text; // Update task name
+                });
+                db.updateData();
+              }
+              Navigator.pop(context);
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Format the selected date to show the day and full date
+    // Format the selected date
     final String formattedDate =
         DateFormat('EEEE, MMMM d').format(selectedDate);
-
-    return Scaffold(
-      // App bar with gradient background and stylized title
+return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -120,11 +203,10 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            // Center the date in the middle and make it clickable
             Align(
               alignment: Alignment.center,
               child: GestureDetector(
-                onTap: _pickDate, // Open date picker on tap
+                onTap: _pickDate,
                 child: Text(
                   formattedDate,
                   style: GoogleFonts.lato(
@@ -138,30 +220,61 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-
-      // Floating action button to add new tasks
-      floatingActionButton: FloatingActionButton(
-        onPressed: createTask,
-        backgroundColor: const Color(0xff2575fc),
-        child: const Icon(Icons.add, color: Colors.white),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Select All/Delete All button on the bottom left
+          Padding(
+            padding: const EdgeInsets.only(left: 32.0, bottom: 30),
+            child: FloatingActionButton(
+              backgroundColor: _isSelectingAll ? Colors.red : Colors.deepPurple,
+              onPressed: _selectOrDeleteAll,
+              child: Icon(
+                _isSelectingAll ? Icons.delete : Icons.select_all,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          // Create Task button on the bottom right
+          Padding(
+            padding: const EdgeInsets.only(right: 32.0, bottom: 30),
+            child: FloatingActionButton(
+              onPressed: createTask,
+              backgroundColor: Colors.deepPurple,
+              child: const Icon(Icons.add, color: Colors.white),
+            ),
+          ),
+        ],
       ),
-      
-      // Body containing the list of tasks
-      body: ListView.builder(
-        
-        itemCount: db.tileVal.length,
-        itemBuilder: (context, index) {
-          return TaskTile(
-            taskName: db.tileVal[index][0],
-            isSelected: db.tileVal[index][1],
-            taskList: db.tileVal[index][2],
-            onChanged: (value) => boxSelected(value, index),
-            index: index,
-            onInsert: (index, newSubtask) => db.insertInnerList(index, newSubtask),
-            updateData: () => db.updateData(),
-          );
-        },
+      body: Padding(
+        padding: const EdgeInsets.only(bottom: 80.0), // Avoid overlap with FABs
+        child: ListView.builder(
+          itemCount: db.tileVal.length,
+          itemBuilder: (context, index) {
+            return TaskTile(
+              taskName: db.tileVal[index][0],
+              isSelected: db.tileVal[index][1],
+              taskList: db.tileVal[index][2],
+              onChanged: (value) => boxSelected(value, index),
+              index: index, // Ensure index is passed
+              onInsert: (index, newSubtask) => db.insertInnerList(index, newSubtask),
+              updateData: () => db.updateData(),
+            );
+          },
+        ),
       ),
     );
   }
 }
+
+
+
+
+// taskName: db.tileVal[index][0],
+//             isSelected: db.tileVal[index][1],
+//             taskList: db.tileVal[index][2],
+//             onChanged: (value) => boxSelected(value, index),
+//             index: index,
+//             onInsert: (index, newSubtask) => db.insertInnerList(index, newSubtask),
+//             updateData: () => db.updateData(),

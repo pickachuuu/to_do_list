@@ -173,14 +173,17 @@ class _TaskTileState extends State<TaskTile> {
                 );
               },
             ),
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.add, size: 18),
-                  onPressed: _addSubtask,
-                ),
-                const Text("Add item"),
-              ],
+            Padding(
+              padding: const EdgeInsets.only(left: 15),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.add, size: 18),
+                    onPressed: _addSubtask,
+                  ),
+                  const Text("Add item"),
+                ],
+              ),
             ),
             const Divider(),
 
@@ -216,7 +219,10 @@ class _TaskTileState extends State<TaskTile> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete, size: 18),
-                      onPressed: () => setState(() => widget.taskList.removeAt(index)),
+                      onPressed: () {
+                        setState(() => widget.taskList.removeAt(index));
+                        widget.updateData();
+                      },
                     ),
                   ],
                 ),
